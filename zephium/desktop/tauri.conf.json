@@ -1,0 +1,105 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "[YOUR_BROWSER_NAME]",
+  "identifier": "app.[your_bundle_id]",
+  "build": {
+    "beforeDevCommand": "pnpm --dir ../frame dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm --dir ../frame build",
+    "frontendDist": "../frame/dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "label": "main",
+        "create": false,
+        "title": "[YOUR_BROWSER_NAME]",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 680,
+        "minHeight": 480,
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay",
+        "transparent": true,
+        "trafficLightPosition": {
+          "x": 7,
+          "y": 25
+        },
+        "url": "browser.html"
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: [your-brand-media]: http://[your-brand-media].localhost",
+        "font-src": "'self' data:",
+        "connect-src": "ipc: http://ipc.localhost",
+        "child-src": "'none'",
+        "frame-src": "'none'",
+        "media-src": "'none'",
+        "worker-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'",
+        "frame-ancestors": "'none'"
+      },
+      "devCsp": {
+        "default-src": "'self'",
+        "script-src": "'self' 'unsafe-eval'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: [your-brand-media]: http://[your-brand-media].localhost",
+        "font-src": "'self' data:",
+        "connect-src": "ipc: http://ipc.localhost ws://localhost:1420 http://localhost:1420",
+        "child-src": "'none'",
+        "frame-src": "'none'",
+        "media-src": "'none'",
+        "worker-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'",
+        "frame-ancestors": "'none'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "Apdevlab",
+    "copyright": "Copyright © 2026 Apdevlab",
+    "category": "Productivity",
+    "shortDescription": "A fast, privacy-focused desktop browser with a built-in AI agent",
+    "homepage": "https://[your-website].app",
+    "license": "MPL-2.0 AND CC-BY-SA-3.0",
+    "resources": {
+      "../LICENSE": "licenses/[YOUR_BROWSER_NAME]-MPL-2.0.txt",
+      "../assets/blocker-seed/v1/LICENSE-CC-BY-SA-3.0.txt": "licenses/blocker/CC-BY-SA-3.0.txt",
+      "../assets/blocker-seed/v1/NOTICE": "licenses/blocker/EasyList-EasyPrivacy-NOTICE.txt"
+    },
+    "macOS": {
+      "minimumSystemVersion": "14.0"
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": true
+      }
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "YOUR_UPDATER_PUBLIC_KEY_BASE64_GOES_HERE",
+      "endpoints": [
+        "https://[your-updater-domain].com/latest.json"
+      ]
+    }
+  }
+}
