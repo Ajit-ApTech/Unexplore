@@ -1,24 +1,33 @@
-```
-# Dependencies
-.pub/
-.buildlog
-.flutter-plugins
-.flutter-plugin-dependencies
-.packages
-
-# Build outputs
-build/
-.dart_tool/
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Logs
-*.log
-
 # OS generated files
 .DS_Store
+*.DS_Store
 Thumbs.db
-```
+
+# Dependencies & Package Managers
+node_modules/
+**/node_modules/
+.pnpm-store/
+package-lock.json
+
+# Build outputs
+target/
+**/target/
+dist/
+**/dist/
+
+# Environment and secrets
+.env
+.env.local
+.env.*
+*.env.*
+*.local
+
+# Logs & temp
+*.log
+*.tmp
+.cache/
+
+# Local tooling & IDEs
+.claude/
+.vscode/*
+!.vscode/extensions.json

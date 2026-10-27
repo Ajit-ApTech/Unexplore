@@ -3,19 +3,19 @@
 // URLs, and copy without having to hard-code strings.
 
 /** The product name shown in About, window titles, and UI copy. */
-export const PRODUCT_NAME = "[YOUR_BROWSER_NAME]";
+export const PRODUCT_NAME = "Unexplore";
 
 /** The bundle identifier used by Tauri, stores, and updater metadata. */
-export const BUNDLE_IDENTIFIER = "app.[your_bundle_id]";
+export const BUNDLE_IDENTIFIER = "app.unexplore";
 
 /** Short tagline shown alongside the product name. */
 export const TAGLINE = "A fast, privacy-focused desktop browser with a built-in AI agent";
 
 /** Official homepage URL (update with your product's site). */
-export const HOMEPAGE_URL = "https://[your-website].app";
+export const HOMEPAGE_URL = "https://unexplore.app";
 
 /** Support / feedback email. */
-export const SUPPORT_EMAIL = "support@[your-website].app";
+export const SUPPORT_EMAIL = "support@unexplore.app";
 
 /** User-agent suffix appended to HTTP requests made by the browser. */
 export const USER_AGENT_SUFFIX = `${PRODUCT_NAME}/__VERSION__`;
@@ -27,10 +27,10 @@ export const UPDATER = {
   PUBLIC_KEY: "YOUR_UPDATER_PUBLIC_KEY_BASE64_GOES_HERE",
 
   /** Endpoint that returns the latest release manifest. */
-  LATEST_JSON_ENDPOINT: "https://[your-updater-domain].com/latest.json",
+  LATEST_JSON_ENDPOINT: "https://updates.unexplore.app/latest.json",
 
   /** URL of the auto-updater binary artefacts. */
-  BINARY_ARTIFACTS_URL: "https://[your-updater-domain].com/update/{platform}/{arch}/{version}",
+  BINARY_ARTIFACTS_URL: "https://updates.unexplore.app/update/{platform}/{arch}/{version}",
 };
 
 /** CSS-friendly colour name for the accent used in design tokens. */

@@ -14,7 +14,7 @@
   import AboutLinks from "../about/AboutLinks.svelte";
   import { WEBSITE } from "../../lib/links";
   import PreferenceSwitch from "../PreferenceSwitch.svelte";
-import { PRODUCT_NAME, TAGLINE } from "$shared/brand";
+  import { PRODUCT_NAME, TAGLINE } from "$shared/brand";
 
   let about = $state<AboutInfo | null>(null);
   let confirming = $state(false);

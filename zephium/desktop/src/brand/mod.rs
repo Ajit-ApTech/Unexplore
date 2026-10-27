@@ -2,25 +2,27 @@
 //! `zephium_desktop::brand` and get the current product name, identifiers,
 //! URLs, and copy without having to hard‑code strings.
 
+#![allow(dead_code)]
+
 use serde::Serialize;
 
 /// The product name shown in About, installer, and window titles.
-pub const PRODUCT_NAME: &str = "[YOUR_BROWSER_NAME]";
+pub const PRODUCT_NAME: &str = "Unexplore";
 
 /// The bundle identifier used by Tauri, stores, and updater metadata.
-pub const BUNDLE_IDENTIFIER: &str = "app.[your_bundle_id]";
+pub const BUNDLE_IDENTIFIER: &str = "app.unexplore";
 
 /// Short tagline shown alongside the product name.
 pub const TAGLINE: &str = "A fast, privacy-focused desktop browser with a built-in AI agent";
 
 /// Official homepage URL (update with your product’s site).
-pub const HOMEPAGE_URL: &str = "https://[your-website].app";
+pub const HOMEPAGE_URL: &str = "https://unexplore.app";
 
 /// Support / feedback email.
-pub const SUPPORT_EMAIL: &str = "support@[your-website].app";
+pub const SUPPORT_EMAIL: &str = "support@unexplore.app";
 
 /// User‑agent suffix appended to HTTP requests made by the browser.
-pub const USER_AGENT_SUFFIX: &str = concat!("[YOUR_BROWSER_NAME]/", env!("CARGO_PKG_VERSION"));
+pub const USER_AGENT_SUFFIX: &str = concat!("Unexplore/", env!("CARGO_PKG_VERSION"));
 
 /// Installer metadata fields (populate in CI or build scripts).
 #[derive(Serialize, Clone, Debug)]
@@ -58,10 +60,10 @@ pub mod updater {
 
     /// Endpoint that returns the latest release manifest.
     /// Must return JSON compatible with Tauri’s update spec.
-    pub const LATEST_JSON_ENDPOINT: &str = "https://[your-updater-domain].com/latest.json";
+    pub const LATEST_JSON_ENDPOINT: &str = "https://updates.unexplore.app/latest.json";
 
     /// URL of the auto‑updater binary artefacts.
-    pub const BINARY_ARTIFACTS_URL: &str = "https://[your-updater-domain].com/update/{platform}/{arch}/{version}";
+    pub const BINARY_ARTIFACTS_URL: &str = "https://updates.unexplore.app/update/{platform}/{arch}/{version}";
 }
 
 /// CSS-friendly colour name for the accent used in design tokens.

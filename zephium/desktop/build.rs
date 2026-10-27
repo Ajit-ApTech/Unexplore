@@ -9,11 +9,11 @@ mod navigation_probe_config;
 
 const MAIN_LABEL: &str = "main";
 const LINUX_APP_ID: &str = "app.zephium";
-const DEVELOPMENT_IDENTIFIER: &str = "app.zephium.dev";
+const DEVELOPMENT_IDENTIFIER: &str = "app.unexplore.dev";
 const LINUX_DESKTOP_TEMPLATE: &str = "linux/zephium.desktop.hbs";
 const PACKAGE_LICENSE: &str = "MPL-2.0 AND CC-BY-SA-3.0";
 const LEGAL_RESOURCES: [(&str, &str); 3] = [
-    ("../LICENSE", "licenses/[YOUR_BROWSER_NAME]-MPL-2.0.txt"),
+    ("../LICENSE", "licenses/Unexplore-MPL-2.0.txt"),
     (
         "../assets/blocker-seed/v1/LICENSE-CC-BY-SA-3.0.txt",
         "licenses/blocker/CC-BY-SA-3.0.txt",

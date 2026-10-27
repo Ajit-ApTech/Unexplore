@@ -1561,6 +1561,7 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
             work_product::work_operation,
             work_product::work_operation_status,
             work_product::work_running,
+            work_product::work_stop_all,
             work_product::work_context_preview,
             media::media_import,
             media::media_open,

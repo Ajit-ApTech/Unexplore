@@ -20,6 +20,8 @@ export const commands = {
 	workOperationStatus: (expectedProfile: string, work: WorkId, operation: WorkCommandId, acknowledge: boolean) => __TAURI_INVOKE<WorkOperationResponseV1_Serialize>("work_operation_status", { expectedProfile, work, operation, acknowledge }),
 	/**  Whether turning Work off would stop work that is running now. */
 	workRunning: () => __TAURI_INVOKE<boolean>("work_running"),
+	/**  Emergency stop: terminates any running agent work across the entire application immediately. */
+	workStopAll: () => __TAURI_INVOKE<boolean>("work_stop_all"),
 	/**  Manifest preview for the composer. Bodies never cross this boundary. */
 	workContextPreview: (expectedProfile: string, purpose: WorkContextPurpose, selection: WorkContextSelectionV1_Deserialize) => __TAURI_INVOKE<WorkContextPreviewV1_Serialize>("work_context_preview", { expectedProfile, purpose, selection }),
 	mediaImport: (expectedProfile: string) => typedError<MediaImportV1_Serialize, null>(__TAURI_INVOKE("media_import", { expectedProfile })),
