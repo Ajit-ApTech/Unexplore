@@ -160,6 +160,7 @@ struct Live {
     replies: HashMap<u32, ReplyData>,
     links: HashSet<String>,
     touched: u64,
+    last_working: Option<String>,
 }
 
 struct PickRecord {
@@ -408,6 +409,7 @@ impl PageAssist {
                 replies: HashMap::new(),
                 links: HashSet::new(),
                 touched: now,
+                last_working: None,
             },
         );
         state.current.insert(space.to_owned(), id.clone());
@@ -1135,6 +1137,7 @@ impl PageAssist {
                     replies: HashMap::new(),
                     links: HashSet::new(),
                     touched: 0,
+                    last_working: None,
                 },
             );
         }

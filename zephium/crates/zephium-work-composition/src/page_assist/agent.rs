@@ -371,6 +371,12 @@ impl Reply {
         self.with_data(|data| {
             data.working.get_or_insert_with(|| tab.to_owned());
         });
+        {
+            let mut state = self.service.state();
+            if let Some(live) = state.live.get_mut(&self.conversation) {
+                live.last_working = Some(tab.to_owned());
+            }
+        }
         self.read_tab(tab).await
     }
 
@@ -631,6 +637,34 @@ async fn body(reply: &Reply) -> End {
                 _ => None,
             })
             .collect();
+
+        // Check if the assistant emitted an embedded pseudo-XML tool tag in plain text
+        if calls.is_empty() {
+            let combined: String = outcome
+                .assistant
+                .iter()
+                .filter_map(|part| match part {
+                    WorkModelPart::Text(t) => Some(t.as_str()),
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+                .join("");
+            if let Some((synthetic_call, cleaned_text)) = tools::extract_pseudo_show_items(&combined) {
+                reply.flush(&mut text);
+                if let Some(b) = text.block {
+                    reply.set_block(
+                        b,
+                        PageAssistBlockV1::Text {
+                            text: cleaned_text,
+                            cites: text.cites.clone(),
+                        },
+                    );
+                }
+                let _ = run_tool(reply, &mut text, synthetic_call).await;
+                break;
+            }
+        }
+
         messages.push(WorkModelMessage::Assistant(outcome.assistant));
         if exhausted && calls.is_empty() && reply.next_block() == 0 && text.block.is_none() {
             reply.flush(&mut text);
@@ -983,7 +1017,16 @@ async fn go_to(reply: &Reply, text: &mut Text, target: &str, new_tab: bool) -> T
         }
         target.to_owned()
     };
-    let working = reply.with_data(|data| data.working.clone()).flatten();
+    let working = reply
+        .with_data(|data| data.working.clone())
+        .flatten()
+        .or_else(|| {
+            let state = reply.service.state();
+            state
+                .live
+                .get(&reply.conversation)
+                .and_then(|live| live.last_working.clone())
+        });
     match working.filter(|_| !new_tab) {
         Some(tab) => move_tab(reply, text, &ports, &tab, &url).await,
         None => open_in_front(reply, text, &ports, &url).await,
@@ -1033,6 +1076,13 @@ async fn move_tab(
     }
     row.state = PageAssistStepStateV1::Done;
     reply.set_block(block, PageAssistBlockV1::Steps { steps: vec![row] });
+    reply.with_data(|data| data.working = Some(tab.to_owned()));
+    {
+        let mut state = reply.service.state();
+        if let Some(live) = state.live.get_mut(&reply.conversation) {
+            live.last_working = Some(tab.to_owned());
+        }
+    }
     read_after_open(reply, tab, &host, "this tab").await
 }
 
@@ -1085,6 +1135,12 @@ async fn open_in_front(
     row.state = PageAssistOpenStateV1::Opened;
     reply.set_block(block, PageAssistBlockV1::Opened { tabs: vec![row] });
     reply.with_data(|data| data.working = Some(tab.clone()));
+    {
+        let mut state = reply.service.state();
+        if let Some(live) = state.live.get_mut(&reply.conversation) {
+            live.last_working = Some(tab.clone());
+        }
+    }
     read_after_open(reply, &tab, &host, "a new tab in front").await
 }
 
@@ -1564,6 +1620,12 @@ async fn act(reply: &Reply, text: &mut Text, steps: Vec<Step>) -> Result<ToolOut
     reply.leased.store(true, Ordering::Release);
     reply.phase(Some(PageAssistPhaseV1::Acting));
     reply.with_data(|data| data.working = Some(plan.tab.clone()));
+    {
+        let mut state = reply.service.state();
+        if let Some(live) = state.live.get_mut(&reply.conversation) {
+            live.last_working = Some(plan.tab.clone());
+        }
+    }
     reply.glow(&plan.tab, Glow::Working);
     let result = run_steps(reply, text, &mut plan).await;
     reply.leased.store(false, Ordering::Release);

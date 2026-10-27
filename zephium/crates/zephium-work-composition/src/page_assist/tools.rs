@@ -261,7 +261,9 @@ pub(crate) fn parse(name: &str, arguments: &Value) -> Option<Call> {
                 .iter()
                 .filter_map(|item| {
                     Some(ItemCall {
-                        reference: string(item, "ref"),
+                        reference: string(item, "ref")
+                            .or_else(|| string(item, "link"))
+                            .map(|r| r.trim_start_matches(|c| c == '*' || c == '@').to_owned()),
                         title: bounded(item, "title", MAX_TITLE_CHARS)?,
                         meta: strings(item, "meta", MAX_META, MAX_META_CHARS),
                     })
@@ -331,6 +333,35 @@ pub(crate) fn parse(name: &str, arguments: &Value) -> Option<Call> {
         },
         _ => return None,
     })
+}
+
+/// Extracts a pseudo `<show_items items=[...] />` tag embedded in plain text output,
+/// returning the parsed Call and the cleaned text with the XML tag removed.
+pub(crate) fn extract_pseudo_show_items(text: &str) -> Option<(Call, String)> {
+    let start = text.find("<show_items")?;
+    let rest = &text[start..];
+    let end = rest.find("/>").map(|i| start + i + 2)
+        .or_else(|| rest.find("</show_items>").map(|i| start + i + 13))
+        .or_else(|| rest.find('>').map(|i| start + i + 1))?;
+
+    let tag = &text[start..end];
+    let items_start = tag.find("items=")?;
+    let after_items = &tag[items_start + 6..];
+    let bracket_start = after_items.find('[')?;
+    let bracket_slice = &after_items[bracket_start..];
+
+    let bracket_end = bracket_slice.rfind(']')?;
+    let json_str = &bracket_slice[..=bracket_end];
+
+    let parsed_val: Value = serde_json::from_str(json_str).ok()?;
+    let parsed_call = parse("show_items", &json!({"items": parsed_val}))?;
+
+    let mut cleaned = String::with_capacity(text.len());
+    cleaned.push_str(&text[..start]);
+    cleaned.push_str(&text[end..]);
+    let cleaned = cleaned.trim().to_owned();
+
+    Some((parsed_call, cleaned))
 }
 
 #[cfg(test)]
@@ -403,5 +434,25 @@ mod tests {
         };
         assert_eq!(items[0].title, "A story");
         assert_eq!(items[0].meta.len(), MAX_META);
+    }
+
+    #[test]
+    fn test_extract_pseudo_show_items() {
+        let raw = "Here are three recent AI-Engineer listings:\n\n<show_items items=[{\"title\":\"AI Engineer Jobs\",\"link\":\"*b28\"},{\"title\":\"ML Engineer\",\"ref\":\"b31\"}] />\n\nTap to open.";
+        let (call, cleaned) = extract_pseudo_show_items(raw).expect("extract pseudo items");
+        match call {
+            Call::ShowItems { items } => {
+                assert_eq!(items.len(), 2);
+                assert_eq!(items[0].title, "AI Engineer Jobs");
+                assert_eq!(items[0].reference.as_deref(), Some("b28"));
+                assert_eq!(items[1].title, "ML Engineer");
+                assert_eq!(items[1].reference.as_deref(), Some("b31"));
+            }
+            _ => panic!("wrong call"),
+        }
+        assert_eq!(
+            cleaned,
+            "Here are three recent AI-Engineer listings:\n\n\n\nTap to open."
+        );
     }
 }
