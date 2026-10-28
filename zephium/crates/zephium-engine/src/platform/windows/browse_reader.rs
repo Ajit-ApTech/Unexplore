@@ -921,6 +921,8 @@ impl BrowseReader {
         }
     }
 
+    pub(crate) fn finish(&self) {}
+
     pub(crate) fn set_enabled(&self, enabled: bool) {
         let Ok(mut state) = self.state.try_borrow_mut() else {
             return;

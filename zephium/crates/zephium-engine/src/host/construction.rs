@@ -1616,6 +1616,11 @@ impl EngineHost {
                 }
                 NavigationTransition::Finished(epoch) => {
                     if load_navigation.is_current(epoch) {
+                        #[cfg(all(
+                            feature = "agentic-browser",
+                            any(target_os = "macos", target_os = "windows")
+                        ))]
+                        super::page_reader::finish(&load_reader);
                         load_permit
                             .emit(&on_load, EngineEvent::LoadingChanged { id, loading: false });
                         // Completion is a presentation signal, but it is not

@@ -1045,6 +1045,15 @@ impl BrowseReader {
         }
     }
 
+    /// The main-frame navigation has finished and settled.
+    pub(crate) fn finish(&self) {
+        if let Ok(mut state) = self.state.try_borrow_mut() {
+            state.bind_pull();
+            state.publish();
+            state.pump();
+        }
+    }
+
     /// The main-frame navigation about to start is a back or forward move.
     pub(crate) fn back_forward(&self, back_forward: bool) {
         if let Ok(mut state) = self.state.try_borrow_mut() {

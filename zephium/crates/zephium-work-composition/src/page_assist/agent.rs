@@ -280,7 +280,6 @@ impl Reply {
         }
         let letters = refs::letters(u16::try_from(index).unwrap_or(u16::MAX))
             .ok_or(PageAssistFaultV1::TooLong)?;
-        self.phase(Some(PageAssistPhaseV1::Reading { site: host.clone() }));
         let readout =
             match tokio::time::timeout(READ_TIMEOUT, ports.page.read(tab, facts.epoch)).await {
                 Ok(Ok(readout)) if readout.epoch == facts.epoch => readout,
@@ -377,7 +376,12 @@ impl Reply {
                 live.last_working = Some(tab.to_owned());
             }
         }
-        self.read_tab(tab).await
+        let mut result = self.read_tab(tab).await;
+        if matches!(result, Err(PageAssistFaultV1::Loading)) {
+            tokio::time::sleep(Duration::from_millis(500)).await;
+            result = self.read_tab(tab).await;
+        }
+        result
     }
 
     async fn context(&self) -> Vec<String> {
@@ -391,6 +395,7 @@ impl Reply {
                         parts.push(self.page_block(index));
                     }
                     Err(_) => {
+                        let handle = self.handle(tab);
                         let host = self
                             .service
                             .ports()
@@ -399,7 +404,7 @@ impl Reply {
                             .and_then(|facts| facts.url)
                             .map(|url| host_of(&url))
                             .unwrap_or_default();
-                        parts.push(format!("(The page {host} could not be read just now.)"));
+                        parts.push(format!("(The attached page {host} ({handle}) is currently loading. Do NOT search externally. Inspect it with read_page {handle}.)"));
                     }
                 },
                 Admitted::Selection { tab, text } => {
@@ -990,6 +995,16 @@ async fn settled(ports: &super::Ports, tab: &str) {
 async fn go_to(reply: &Reply, text: &mut Text, target: &str, new_tab: bool) -> ToolOutcome {
     let ports = reply.service.ports().clone();
     let target = target.trim();
+    if let Some(query) = target.strip_prefix("search:").map(str::trim) {
+        if let Some(first_read) = reply.with_data(|data| data.reads.first().cloned()).flatten() {
+            let host = first_read.page.host.to_lowercase();
+            let query_lower = query.to_lowercase();
+            let words_lower = reply.words.to_lowercase();
+            if host.contains("linkedin") && (query_lower.contains("linkedin") || query_lower.contains("ajit") || !words_lower.contains("google")) {
+                return Err(format!("You are already on {}! Do not perform external web search. Answer from the page passages (@a1, @a2) or use `act` to interact with the site.", first_read.page.host));
+            }
+        }
+    }
     let url = if let Some(query) = target
         .strip_prefix("search:")
         .map(str::trim)

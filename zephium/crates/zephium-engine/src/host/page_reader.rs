@@ -107,6 +107,18 @@ pub(super) fn commit(slot: &Weak<RefCell<Option<Reader>>>, epoch: u64, url: &str
     };
 }
 
+#[cfg_attr(not(any(target_os = "macos", target_os = "windows")), allow(dead_code))]
+pub(super) fn finish(slot: &Weak<RefCell<Option<Reader>>>) {
+    let Some(slot) = slot.upgrade() else {
+        return;
+    };
+    if let Ok(reader) = slot.try_borrow() {
+        if let Some(reader) = reader.as_ref() {
+            reader.finish();
+        }
+    };
+}
+
 /// The person used `tab` while steps held it.
 pub(crate) fn report_human_input(tab: ItemId) {
     if let Some(policy) = policy() {

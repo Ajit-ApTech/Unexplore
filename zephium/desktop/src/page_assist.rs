@@ -412,10 +412,6 @@ mod product {
         fn facts(&self, tab: &str) -> Option<TabFacts> {
             let item = zephium_core::ids::ItemId::parse(tab);
             let committed = item.and_then(zephium_engine::page_reader::committed_epoch);
-            // A document that predates the reader (it was switched on after
-            // the page loaded) reads as loading until its next navigation.
-            let unread = committed.is_some()
-                && item.is_some_and(|item| !zephium_engine::page_reader::readable(item));
             with_tabs(|tabs| {
                 tabs.get(tab).map(|entry| TabFacts {
                     profile: entry.profile,
@@ -424,7 +420,7 @@ mod product {
                     title: Some(entry.title.clone()),
                     private: entry.private,
                     viewer: entry.viewer,
-                    loading: entry.loading || unread,
+                    loading: entry.loading,
                     epoch: committed.unwrap_or(entry.epoch),
                 })
             })
