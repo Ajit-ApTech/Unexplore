@@ -25,14 +25,12 @@ Unexplore is a modern, high-performance web browser featuring:
 ### Running in Development
 
 ```bash
-cd zephium
 pnpm dev
 ```
 
 ### Building for Production
 
 ```bash
-cd zephium
-pnpm tauri build
+pnpm build
 ```
 

@@ -14,6 +14,23 @@ target/
 **/target/
 dist/
 **/dist/
+/crates/zephium-engine/target/
+/vendor/adblock/target/
+/crates/zephium-blocker/fuzz/artifacts/
+/crates/zephium-blocker/fuzz/target/
+gen/schemas
+
+# Evaluator & caches
+/eval/agentic-browsing/local-results/
+__pycache__/
+*.py[cod]
+
+# Frame generated
+/frame/src/shared/i18n/
+/frame/project.inlang/cache/
+/frame/.vitest-attachments/
+/frame/dist-work-preview/
+/frame/reports/
 
 # Environment and secrets
 .env
